@@ -1,0 +1,38 @@
+[
+    {
+        "Id": 1,
+        "Name": "English"
+    },
+    {
+        "Id": 2,
+        "Name": "The Simpsons"
+    },
+    {
+        "Id": 3,
+        "Name": "Psychology"
+    },
+    {
+        "Id": 4,
+        "Name": "Narcos"
+    },
+    {
+        "Id": 5,
+        "Name": "The Crown"
+    },
+    {
+        "Id": 6,
+        "Name": "Computer Science"
+    },
+    {
+        "Id": 7,
+        "Name": "Friends"
+    },
+    {
+        "Id": 9,
+        "Name": "Math"
+    },
+    {
+        "Id": 10,
+        "Name": "Literature"
+    }
+]
