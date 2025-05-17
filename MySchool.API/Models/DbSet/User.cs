@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySchool.API.Enums;
+using MySchool.API.Models.DbSet.ExamEntities;
 using System.ComponentModel.DataAnnotations;
 namespace MySchool.API.Models.DbSet
 {
@@ -12,6 +13,8 @@ namespace MySchool.API.Models.DbSet
         [StringLength(255)]
         public required string UserName { get; set; }
         public required eRole Role { get; set; }
+      
+        [StringLength(500)]
         public required string PasswordHash { get; set; }
         public bool MustChangePassword { get; set; } = true;
         public bool IsActive { get; set; } = false;
@@ -71,17 +74,8 @@ namespace MySchool.API.Models.DbSet
             builder.HasMany(x => x.Sessions)
                      .WithOne(x => x.User)
                      .HasForeignKey(x => x.UserId)
-                     .OnDelete(DeleteBehavior.NoAction);
+                     .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(x => x.Fees)
-                        .WithOne(x => x.Student)
-                        .HasForeignKey(x => x.StudentId)
-                        .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasMany(x => x.Announcements)
-                        .WithOne(x => x.User)
-                        .HasForeignKey(x => x.UserId)
-                        .OnDelete(DeleteBehavior.NoAction);
 
         }
     }

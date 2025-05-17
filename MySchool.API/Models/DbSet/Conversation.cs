@@ -23,7 +23,8 @@ namespace MySchool.API.Models.DbSet
             builder.HasOne(x => x.UserOne)
                 .WithMany()
                 .HasForeignKey(x => x.UserOneId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(x => x.UserTwo)
                 .WithMany()
                 .HasForeignKey(x => x.UserTwoId)

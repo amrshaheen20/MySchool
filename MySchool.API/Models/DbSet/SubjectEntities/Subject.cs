@@ -24,15 +24,16 @@ namespace MySchool.API.Models.DbSet.SubjectEntities
         public void Configure(EntityTypeBuilder<Subject> builder)
         {
             builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
+
             builder.HasMany(x => x.Assignments)
                 .WithOne(x => x.Subject)
                 .HasForeignKey(x => x.SubjectId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(x => x.Timetables)
                 .WithOne(x => x.Subject)
                 .HasForeignKey(x => x.SubjectId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

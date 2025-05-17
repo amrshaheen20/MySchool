@@ -21,6 +21,16 @@ namespace MySchool.API.Models.DbSet
         {
             builder.ToTable("Guardians");
             builder.HasIndex(x => new { x.StudentId, x.GuardianId }).IsUnique();
+
+            builder.HasOne(g => g.Student)
+                .WithMany()
+                .HasForeignKey(g => g.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);           
+            
+            builder.HasOne(g => g.Guardian)
+                .WithMany()
+                .HasForeignKey(g => g.GuardianId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

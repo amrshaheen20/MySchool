@@ -9,12 +9,10 @@ namespace MySchool.API.Models.DbSet
         [Required, StringLength(500)]
         public string Content { get; set; } = default!;
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public int ConversationId { get; set; }
 
-        public bool IsDeleted { get; set; }
-
-        public User User { get; set; } = default!;
+        public User? User { get; set; } = default!;
         public Conversation Conversation { get; set; } = default!;
     }
 
@@ -25,16 +23,12 @@ namespace MySchool.API.Models.DbSet
             builder.HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(x => x.Conversation)
                 .WithMany(x => x.Messages)
                 .HasForeignKey(x => x.ConversationId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-
-
-            builder.HasQueryFilter(x => !x.IsDeleted);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

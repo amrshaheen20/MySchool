@@ -39,10 +39,10 @@ namespace MySchool.API.Models.DbSet.ClassRoomEntities
                         .HasForeignKey(x => x.ClassRoomId)
                         .OnDelete(DeleteBehavior.Cascade);
 
-            //builder.HasMany(x => x.Assignments)
-            //         .WithOne(x => x.ClassRoom)
-            //         .HasForeignKey(x => x.ClassRoomId)
-            //         .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(x => x.Assignments)
+                     .WithOne(x => x.ClassRoom)
+                     .HasForeignKey(x => x.ClassRoomId)
+                     .OnDelete(DeleteBehavior.Cascade);
 
         }
     }
