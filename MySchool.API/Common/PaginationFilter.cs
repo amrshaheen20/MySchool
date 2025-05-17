@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -28,25 +27,23 @@ namespace MySchool.API.Common
         /// <summary>
         /// Page number (default is 1, min 1).
         /// </summary>
-        [DefaultValue(1)]
-        [Range(1, int.MaxValue, ErrorMessage = "Page must be greater than 0")]
         public int Page { get; set; } = 1;
 
         /// <summary>
         /// Number of items per page (default is 10, min 0, max 500).
         /// </summary>
-        /// <example>10</example>
-        [DefaultValue(10)]
         public int PageSize { get; set; } = 10;
 
         /// <summary>
         /// Filtering criteria as key-value pairs.
         /// </summary>
+        [DefaultValue(null)]
         public Dictionary<string, string>? Where { get; set; }
 
         /// <summary>
         /// Sorting criteria as key-value pairs.
         /// </summary>
+        [DefaultValue(null)]
         public Dictionary<string, string>? OrderBy { get; set; }
 
         /// <summary>
@@ -73,7 +70,8 @@ namespace MySchool.API.Common
 
             int totalRecords = query.Count();
 
-            PageSize = Math.Clamp(PageSize, 10, 500);
+            PageSize = Math.Clamp(PageSize, 0, 500);
+            Page = Math.Clamp(Page, 1, int.MaxValue);
             query = query.Skip((Page - 1) * PageSize).Take(PageSize);
 
             return new PaginateBlock<TResponse>
@@ -121,102 +119,168 @@ namespace MySchool.API.Common
             return query.Where(lambda);
         }
 
-        private IQueryable<TResponse> ApplyFilters(IQueryable<TResponse> query, Dictionary<string, string> filters)
+        private IQueryable<TResponse> ApplyFilters<TResponse>(IQueryable<TResponse> query, Dictionary<string, string> filters)
         {
             var parameter = Expression.Parameter(typeof(TResponse), "x");
             Expression? filterExpression = null;
 
             foreach (var filter in filters)
             {
-                var property = GetProperty(typeof(TResponse), filter.Key);
-
-                if (property == null)
-                    continue;
+                var propertyAccess = BuildPropertyPathExpression(parameter, filter.Key);
+                if (propertyAccess == null)
+                    throw new ValidationException($"Property path '{filter.Key}' not found");
 
                 try
                 {
-                    var propertyAccess = Expression.Property(parameter, property);
-                    object? convertedValue;
-                    var underlyingType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
-
-                    if (underlyingType == typeof(DateOnly))
-                    {
-                        convertedValue = DateOnly.Parse(filter.Value);
-                    }
-                    else if (underlyingType.IsEnum)
-                    {
-                        convertedValue = Enum.Parse(underlyingType, filter.Value);
-                    }
-                    else
-                    {
-                        convertedValue = Convert.ChangeType(filter.Value, underlyingType);
-                    }
-                    var filterValue = Expression.Constant(convertedValue, property.PropertyType);
-                    var equalsExpression = Expression.Equal(propertyAccess, filterValue);
-
+                    var condition = BuildCondition(propertyAccess, filter.Value);
                     filterExpression = filterExpression == null
-                        ? equalsExpression
-                        : Expression.AndAlso(filterExpression, equalsExpression);
+                        ? condition
+                        : Expression.AndAlso(filterExpression, condition);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    continue;
+                    throw new ValidationException($"Failed to apply filter for property '{filter.Key}'", ex);
                 }
             }
 
-            if (filterExpression == null)
-                return query;
-
-            var lambda = Expression.Lambda<Func<TResponse, bool>>(filterExpression, parameter);
-            return query.Where(lambda);
-        }
-
-        private IQueryable<TResponse> ApplySorting(IQueryable<TResponse> query, Dictionary<string, string> orderBy)
-        {
-            bool firstSort = true;
-            var parameter = Expression.Parameter(typeof(TResponse), "x");
-            foreach (var sort in orderBy)
+            if (filterExpression != null)
             {
-                var property = GetProperty(typeof(TResponse), sort.Key);
-
-                if (property == null)
-                    continue;
-
-                var propertyAccess = Expression.Property(parameter, property);
-                var lambda = Expression.Lambda(propertyAccess, parameter);
-
-                string methodName;
-                if (firstSort)
-                {
-                    methodName = sort.Value.StartsWith("desc", StringComparison.OrdinalIgnoreCase) ? "OrderByDescending" : "OrderBy";
-                    firstSort = false;
-                }
-                else
-                {
-                    methodName = sort.Value.StartsWith("desc", StringComparison.OrdinalIgnoreCase) ? "ThenByDescending" : "ThenBy";
-                }
-
-                var method = typeof(Queryable).GetMethods()
-                    .First(m => m.Name == methodName && m.GetParameters().Length == 2)
-                    .MakeGenericMethod(typeof(TResponse), property.PropertyType);
-
-                query = (IQueryable<TResponse>)method.Invoke(null, new object[] { query, lambda })!;
+                var lambda = Expression.Lambda<Func<TResponse, bool>>(filterExpression, parameter);
+                return query.Where(lambda);
             }
 
             return query;
         }
 
-        private PropertyInfo? GetProperty(Type type, string propertyPath)
+        private Expression BuildCondition(Expression propertyAccess, string value)
         {
-            PropertyInfo? property = null;
-            foreach (var part in propertyPath.Replace("_", "").Split('.'))
+            var propertyType = propertyAccess.Type;
+            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+            if (underlyingType == typeof(DateOnly))
+                return BuildDateOnlyCondition(propertyAccess, value);
+
+            if (underlyingType.IsEnum)
             {
-                property = type.GetProperty(part, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                var enumValue = Enum.Parse(underlyingType, value);
+                var constant = Expression.Constant(enumValue, propertyType);
+                return Expression.Equal(propertyAccess, constant);
+            }
+
+            var convertedValue = Convert.ChangeType(value, underlyingType);
+            var valueConst = Expression.Constant(convertedValue, propertyType);
+            return Expression.Equal(propertyAccess, valueConst);
+        }
+
+        private Expression BuildDateOnlyCondition(Expression propertyAccess, string value)
+        {
+            Expression BuildDateRangeExpression(Expression propertyAccess, DateOnly start, DateOnly end)
+            {
+                var startConst = Expression.Constant(start, typeof(DateOnly));
+                var endConst = Expression.Constant(end, typeof(DateOnly));
+
+                return Expression.AndAlso(
+                    Expression.GreaterThanOrEqual(propertyAccess, startConst),
+                    Expression.LessThan(propertyAccess, endConst)
+                );
+            }
+
+
+
+            var parts = value.Split('-');
+
+            if (parts.Length == 1 && int.TryParse(parts[0], out int year))
+            {
+                var start = new DateOnly(year, 1, 1);
+                var end = start.AddYears(1);
+                return BuildDateRangeExpression(propertyAccess, start, end);
+            }
+
+            if (parts.Length == 2 &&
+                int.TryParse(parts[0], out int year2) &&
+                int.TryParse(parts[1], out int month))
+            {
+                var start = new DateOnly(year2, month, 1);
+                var end = start.AddMonths(1);
+                return BuildDateRangeExpression(propertyAccess, start, end);
+            }
+
+            var exact = DateOnly.Parse(value);
+            var exactConst = Expression.Constant(exact, typeof(DateOnly));
+            return Expression.Equal(propertyAccess, exactConst);
+        }
+
+
+        private IQueryable<TResponse> ApplySorting(IQueryable<TResponse> query, Dictionary<string, string> orderBy)
+        {
+            bool firstSort = true;
+            var parameter = Expression.Parameter(typeof(TResponse), "x");
+
+            foreach (var sort in orderBy)
+            {
+
+                var propertyAccess = BuildPropertyPathExpression(parameter, sort.Key);
+                if (propertyAccess == null)
+                    throw new ArgumentException($"Property path '{sort.Key}' not found");
+
+                try
+                {
+                    var lambda = Expression.Lambda(propertyAccess, parameter);
+
+                    string methodName;
+                    if (firstSort)
+                    {
+                        methodName = sort.Value.StartsWith("desc", StringComparison.OrdinalIgnoreCase)
+                            ? "OrderByDescending"
+                            : "OrderBy";
+                        firstSort = false;
+                    }
+                    else
+                    {
+                        methodName = sort.Value.StartsWith("desc", StringComparison.OrdinalIgnoreCase)
+                            ? "ThenByDescending"
+                            : "ThenBy";
+                    }
+
+                    var method = typeof(Queryable).GetMethods()
+                        .First(m => m.Name == methodName && m.GetParameters().Length == 2)
+                        .MakeGenericMethod(typeof(TResponse), propertyAccess.Type);
+
+                    query = (IQueryable<TResponse>)method.Invoke(null, new object[] { query, lambda })!;
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Failed to apply sorting for property '{sort.Key}'", ex);
+                }
+            }
+
+            return query;
+        }
+
+        private Expression? BuildPropertyPathExpression(ParameterExpression parameter, string propertyPath)
+        {
+            propertyPath = propertyPath.Replace("_", "");
+            string[] parts = propertyPath.Split('.');
+
+            if (parts.Length == 0)
+                return null;
+
+            Type currentType = parameter.Type;
+            Expression? expression = parameter;
+
+            foreach (var part in parts)
+            {
+                PropertyInfo? property = currentType.GetProperty(part,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
                 if (property == null)
                     return null;
-                type = property.PropertyType;
+
+                expression = Expression.Property(expression, property);
+                currentType = property.PropertyType;
             }
-            return property;
+
+            return expression;
         }
 
     }
