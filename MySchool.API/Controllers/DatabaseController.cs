@@ -35,7 +35,7 @@ namespace MySchool.API.Controllers
                     .SetStatus(HttpStatusCode.OK)
                     .SetMessage("Database reset and seeded successfully."));
             }
-            catch (Exception ex)
+            catch
             {
                 return BuildResponse(new BaseResponse()
                     .SetStatus(HttpStatusCode.InternalServerError)

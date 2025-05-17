@@ -28,9 +28,9 @@ namespace MySchool.API.Services.AnnouncementContainer
             await Repository.AddAsync(Entity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse<AnnouncementResponseDto>()
-                .SetStatus(HttpStatusCode.Created)
-                .SetData(mapper.Map<AnnouncementResponseDto>(Entity));
+            return (await GetAnnouncementByIdAsync(Entity.Id))
+                .SetStatus(HttpStatusCode.Created);
+        
         }
         public async Task<IBaseResponse<AnnouncementResponseDto>> GetAnnouncementByIdAsync(int AnnouncementId)
         {
@@ -73,8 +73,8 @@ namespace MySchool.API.Services.AnnouncementContainer
             await unitOfWork.SaveAsync();
 
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.OK)
-                .SetMessage("Announcement deleted successfully");
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Announcement deleted successfully.");
         }
 
 

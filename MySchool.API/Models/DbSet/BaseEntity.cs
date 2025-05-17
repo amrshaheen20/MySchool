@@ -19,13 +19,5 @@ namespace MySchool.API.Models.DbSet
         [Column("updated_at", Order = 1001)]
         [DefaultValueSql("getutcdate()")]
         public DateTime UpdatedAt { get; set; }
-
-
-        public BaseEntity()
-        {
-            var dateTime = DateTime.UtcNow;
-            CreatedAt = dateTime;
-            UpdatedAt = dateTime;
-        }
     }
 }

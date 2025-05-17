@@ -18,12 +18,6 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\ExamsController.cs" />
-    <Compile Remove="Models\DbSet\ClassRoomEntities\Evaluation.cs" />
-    <Compile Remove="Models\DbSet\ExamEntities\AssignmentGrade.cs" />
-    <Compile Remove="Models\DbSet\ExamEntities\Exam.cs" />
-    <Compile Remove="Models\DbSet\ExamEntities\Option.cs" />
-    <Compile Remove="Models\DbSet\ExamEntities\Question.cs" />
-    <Compile Remove="Models\DbSet\ExamEntities\StudentAnswer.cs" />
     <Compile Remove="Services\ExamService.cs" />
   </ItemGroup>
 
@@ -31,7 +25,6 @@
 	  <PackageReference Include="AutoMapper" Version="14.0.0" />
 	  <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 	  <PackageReference Include="Bogus" Version="35.6.3" />
-	  <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />

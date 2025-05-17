@@ -6,8 +6,8 @@ namespace MySchool.API.Models.DbSet
 {
     public class Message : BaseEntity
     {
-        [Required, StringLength(500)]
-        public string Content { get; set; } = default!;
+        [StringLength(500)]
+        public required string Content { get; set; } = default!;
 
         public int? UserId { get; set; }
         public int ConversationId { get; set; }
@@ -20,6 +20,9 @@ namespace MySchool.API.Models.DbSet
     {
         public void Configure(EntityTypeBuilder<Message> builder)
         {
+            builder.HasIndex(x => x.UserId);
+            builder.HasIndex(x => x.ConversationId);
+
             builder.HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)

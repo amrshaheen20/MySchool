@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace MySchool.API.Models.DbSet.ClassRoomEntities
+namespace MySchool.API.Models.DbSet
 {
     public class Enrollment : BaseEntity
     {
@@ -20,6 +20,7 @@ namespace MySchool.API.Models.DbSet.ClassRoomEntities
         public void Configure(EntityTypeBuilder<Enrollment> builder)
         {
             builder.HasIndex(e => new { e.StudentId }).IsUnique(); //One student can only enroll in one class
+            builder.HasIndex(e => e.ClassRoomId);
         }
     }
 }

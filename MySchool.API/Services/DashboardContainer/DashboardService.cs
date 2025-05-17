@@ -4,7 +4,6 @@ using MySchool.API.Common;
 using MySchool.API.Enums;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Models.DbSet.ExamEntities;
 using MySchool.API.Models.Dtos;
 using System.Net;

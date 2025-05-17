@@ -1,6 +1,5 @@
 ﻿using MySchool.API.Enums;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Validators;
 
 namespace MySchool.API.Models.Dtos

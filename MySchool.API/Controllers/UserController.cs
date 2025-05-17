@@ -10,7 +10,7 @@ namespace MySchool.API.Controllers
     [Route("api/me")]
     [ApiController]
     [Authorize(Policy = Policies.AllUsers)]
-    [ApiExplorerSettings(GroupName = "me")]
+    [ApiExplorerSettings(GroupName = "@me")]
     public class UserController(AccountService accountService) : BaseController
     {
         /// <summary>

@@ -56,7 +56,7 @@ namespace MySchool.API.Controllers
         /// <param name="class_id">The id of the class</param>
         /// <returns>The deleted class</returns>
         [HttpDelete("{class_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> DeleteClass(int class_id)
         {
@@ -70,7 +70,7 @@ namespace MySchool.API.Controllers
         /// <param name="Class">The class to update</param>
         /// <returns>The updated class</returns>
         [HttpPatch("{class_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClassResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> UpdateClass(int class_id, ClassRequestDto Class)
         {

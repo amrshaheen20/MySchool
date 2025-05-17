@@ -8,15 +8,25 @@ namespace MySchool.API.Extensions
 {
     public static partial class ApiExtensions
     {
+        public static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters = { new JsonStringEnumConverter() },
+        };
+
 
         public static void AddApiConfigurationExtensions(this IServiceCollection services)
         {
             services.Configure<JsonOptions>(options =>
              {
 
-                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonSerializerOptions.PropertyNamingPolicy;
+               
+                 foreach (var converter in options.JsonSerializerOptions.Converters)
+                     options.JsonSerializerOptions.Converters.Add(converter);
 
+           
 
 
 

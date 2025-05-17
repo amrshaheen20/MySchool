@@ -2,7 +2,7 @@
 using MySchool.API.Common;
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.AttendanceContainer.Injector;
 using MySchool.API.Services.EnrollmentContainer.Injector;
@@ -24,7 +24,7 @@ namespace MySchool.API.Services.AttendanceContainer
             return unitOfWork.GetRepository<Attendance>().AddInjector(attendanceInjector);
         }
 
-        public async Task<IBaseResponse<object>> CreateAttendanceAsync(AttendanceRequestDto requestDto)
+        public async Task<IBaseResponse<AttendanceResponseDto>> CreateAttendanceAsync(AttendanceRequestDto requestDto)
         {
             /*
             # Case Scenarios
@@ -33,7 +33,6 @@ namespace MySchool.API.Services.AttendanceContainer
             */
 
             var Repository = GetRepository();
-
             var filter = new CommandsInjector<Attendance>();
             filter.Where(e => e.StudentId == requestDto.StudentId && e.Date == requestDto.Date);
             var existingAttendance = await Repository.GetByAsync(filter);
@@ -42,9 +41,8 @@ namespace MySchool.API.Services.AttendanceContainer
                 mapper.Map(requestDto, existingAttendance);
                 Repository.Update(existingAttendance);
                 await unitOfWork.SaveAsync();
-                return new BaseResponse()
-                    .SetStatus(HttpStatusCode.OK)
-                    .SetMessage("Attendance updated successfully");
+                return (await GetAttendanceByIdAsync(existingAttendance.Id))
+                    .SetStatus(HttpStatusCode.OK);
             }
 
             var Entity = mapper.Map<Attendance>(requestDto);
@@ -54,9 +52,8 @@ namespace MySchool.API.Services.AttendanceContainer
             await Repository.AddAsync(Entity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse()
-                .SetStatus(HttpStatusCode.Created)
-                .SetMessage("Attendance added successfully");
+            return (await GetAttendanceByIdAsync(Entity.Id))
+                   .SetStatus(HttpStatusCode.Created);
         }
 
         public async Task<IBaseResponse<AttendanceResponseDto>> GetAttendanceByIdAsync(int attendanceId)
@@ -90,13 +87,13 @@ namespace MySchool.API.Services.AttendanceContainer
         }
 
 
-        public async Task<IBaseResponse<AttendanceResponseDto>> UpdateAttendanceAsync(int attendanceId, AttendanceRequestDto requestDto)
+        public async Task<IBaseResponse<object>> UpdateAttendanceAsync(int attendanceId, AttendanceRequestDto requestDto)
         {
             var Repository = GetRepository();
             var Entity = await Repository.GetByIdAsync(attendanceId);
             if (Entity == null)
             {
-                return new BaseResponse<AttendanceResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
                     .SetMessage("Attendance not found");
             }
@@ -105,12 +102,12 @@ namespace MySchool.API.Services.AttendanceContainer
             Repository.Update(Entity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse<AttendanceResponseDto>()
-                .SetStatus(HttpStatusCode.OK)
-                .SetMessage("Attendance updated successfully");
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Attendance updated successfully.");
         }
 
-        public async Task<IBaseResponse<AttendanceResponseDto>> DeleteAttendanceAsync(int attendanceId)
+        public async Task<IBaseResponse<object>> DeleteAttendanceAsync(int attendanceId)
         {
             var Repository = GetRepository();
             var Entity = await Repository.GetByIdAsync(attendanceId);
@@ -119,7 +116,7 @@ namespace MySchool.API.Services.AttendanceContainer
 
             if (Entity == null)
             {
-                return new BaseResponse<AttendanceResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
                     .SetMessage("Attendance not found");
             }
@@ -127,15 +124,15 @@ namespace MySchool.API.Services.AttendanceContainer
             Repository.Delete(Entity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse<AttendanceResponseDto>()
-                .SetStatus(HttpStatusCode.OK)
-                .SetMessage("Attendance deleted successfully");
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Attendance deleted successfully.");
         }
 
         //Class
         public IBaseResponse<PaginateBlock<ClassAttendanceResponseDto>> GetClassAttendanceById(ClassAttendanceRequestDto request, PaginationFilter<ClassAttendanceResponseDto> filter)
         {
-            enrollmentInjector.IncludeSTudent();
+            enrollmentInjector.IncludeStudents();
             //get all students in the class
             var injector = new CommandsInjector<Enrollment>();
             injector.Where(x => x.ClassRoomId == request.ClassId);
@@ -156,7 +153,7 @@ namespace MySchool.API.Services.AttendanceContainer
             var classAttendances = students.Select(enrollment => new ClassAttendanceResponseDto
             {
                 Student = enrollment.Student,
-                Attendance = attendances.FirstOrDefault(a => a.StudentId == enrollment.Student.Id && a.Date == request.Date)
+                Attendance = attendances.FirstOrDefault(a => a.Student.Id == enrollment.Student.Id && a.Date == request.Date)
             });
 
             return new BaseResponse<PaginateBlock<ClassAttendanceResponseDto>>()

@@ -64,7 +64,7 @@ namespace MySchool.API.Controllers
         /// <param name="student_id">The ID of the student to remove</param>
         /// <returns>Status of the operation</returns>
         [HttpDelete("{guardian_account_id}/children/{student_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> DeleteChild(int guardian_account_id, [FromRoute] int student_id)
         {

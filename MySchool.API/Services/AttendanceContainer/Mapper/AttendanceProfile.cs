@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 
 namespace MySchool.API.Services.AttendanceContainer.Mapper
@@ -17,8 +17,8 @@ namespace MySchool.API.Services.AttendanceContainer.Mapper
 
             CreateMap<Attendance, AttendanceResponseDto>()
                 .ForMember(
-                    dest => dest.ClassId,
-                    opt => opt.MapFrom(src => src.ClassRoomId)
+                    dest => dest.Class,
+                    opt => opt.MapFrom(src => src.ClassRoom)
                 );
         }
     }

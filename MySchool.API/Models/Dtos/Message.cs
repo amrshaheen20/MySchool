@@ -16,7 +16,7 @@ namespace MySchool.API.Models.Dtos
     {
         public required int ConversationId { get; set; }
         public required string Content { get; set; } = default!;
-        public required AccountResponseDto User { get; set; } = default!;
+        public required AccountResponseDto? User { get; set; } = default!;
         public required bool IsEdited { get; set; }
         public required DateTime CreatedAt { get; set; }
         public required bool IsUnread { get; set; }

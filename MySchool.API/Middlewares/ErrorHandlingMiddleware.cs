@@ -1,11 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MySchool.API.Common;
 using MySchool.API.Exceptions;
+using MySchool.API.Extensions;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Text.Json;
 
 namespace MySchool.API.Middlewares
 {
-    public class ErrorHandlingMiddleware(RequestDelegate _next, ILogger<ErrorHandlingMiddleware> _logger, IWebHostEnvironment env)
+    public class ErrorHandlingMiddleware(RequestDelegate _next,
+                                         ILogger<ErrorHandlingMiddleware> _logger,
+                                         IWebHostEnvironment env)
     {
         public async Task Invoke(HttpContext context)
         {
@@ -43,12 +50,12 @@ namespace MySchool.API.Middlewares
                 else if (ex is UnauthorizedAccessException UnauthorizedAccessException)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    errorResponseMessasge = UnauthorizedAccessException.Message ?? "Unauthorized access.";
+                    errorResponseMessasge = UnauthorizedAccessException.Message;
                 }
                 else if (ex is ForbiddenAccessException forbiddenAccess)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                    errorResponseMessasge = forbiddenAccess.Message ?? "Forbidden access.";
+                    errorResponseMessasge = forbiddenAccess.Message;
                 }
                 else if (ex is DbUpdateException dbUpdateEx)
                 {
@@ -60,12 +67,18 @@ namespace MySchool.API.Middlewares
                         errorResponseMessasge = "A conflict occurred. The item may already exist.";
                     }
                 }
+                else if (ex is ValidationException validationEx)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponseMessasge = validationEx.Message;
+                }
 
-                var response = new BaseResponse()
+
+                    var response = new BaseResponse()
                     .SetMessage(errorResponseMessasge)
                     .SetStatus((HttpStatusCode)context.Response.StatusCode);
 
-                await context.Response.WriteAsJsonAsync(response);
+                await context.Response.WriteAsJsonAsync(response, ApiExtensions.JsonSerializerOptions);
             }
 
 

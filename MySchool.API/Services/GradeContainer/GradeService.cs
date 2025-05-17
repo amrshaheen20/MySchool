@@ -5,6 +5,7 @@ using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
+using MySchool.API.Services.EnrollmentContainer.Injector;
 using MySchool.API.Services.GradeContainer.Injector;
 using System.Net;
 
@@ -14,7 +15,8 @@ namespace MySchool.API.Services.GradeContainer
         IUnitOfWork unitOfWork,
         IMapper mapper,
         GradeInjector gradeInjector,
-        IHttpContextAccessor contextAccessor
+        IHttpContextAccessor contextAccessor,
+        EnrollmentInjector enrollmentInjector
     ) : IServiceInjector
     {
         private IGenericRepository<Grade> GetRepository()
@@ -134,5 +136,34 @@ namespace MySchool.API.Services.GradeContainer
                  .SetStatus(HttpStatusCode.NoContent)
                  .SetMessage($"{deletedCount} grades deleted.");
         }
+
+
+
+        public IBaseResponse<PaginateBlock<SubjectGradesResponseDto>> GetSubjectGradesById(SubjectGradesRequestDto request, PaginationFilter<SubjectGradesResponseDto> filter)
+        {
+            //get all students
+            var students = mapper.ProjectTo<EnrollmentResponseDto>(unitOfWork.GetRepository<Enrollment>().AddInjector(enrollmentInjector).GetAll());
+            if (students == null)
+            {
+                return new BaseResponse<PaginateBlock<SubjectGradesResponseDto>>()
+                    .SetStatus(HttpStatusCode.NotFound)
+                    .SetMessage("There are no students to show their grades.");
+            }
+
+            //get all grades
+            var grades = mapper.ProjectTo<GradeResponseDto>(GetRepository().GetAll());
+
+
+            var subjectGrades = students.Select(enrollment => new SubjectGradesResponseDto
+            {
+                Student = enrollment.Student,
+                Grade = grades.FirstOrDefault(a => a.Student.Id == enrollment.Student.Id && a.Student.Id == request.SubjectId && a.TermNumber == request.Term)
+            });
+
+            return new BaseResponse<PaginateBlock<SubjectGradesResponseDto>>()
+                .SetStatus(HttpStatusCode.OK)
+                .SetData(filter.Apply(subjectGrades));
+        }
+
     }
 }

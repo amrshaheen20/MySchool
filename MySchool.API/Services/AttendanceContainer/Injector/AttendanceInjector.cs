@@ -3,7 +3,6 @@ using MySchool.API.Enums;
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 
 namespace MySchool.API.Services.AttendanceContainer.Injector
 {

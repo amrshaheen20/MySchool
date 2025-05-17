@@ -20,7 +20,7 @@ namespace MySchool.API.Controllers
         /// </summary>
         /// <param name="account">The account to create</param>
         /// <returns>The created account</returns>
-        [HttpPost()]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AccountAdminResponseDto))]
         public async Task<IActionResult> Create([FromBody] AccountRequestDto account)
         {
@@ -33,7 +33,7 @@ namespace MySchool.API.Controllers
         /// <param name="Id">The ID of the account to get</param>
         /// <param name="filter">The filter to apply to the accounts</param>
         /// <returns>The accounts</returns>
-        [HttpGet()]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginateBlock<AccountAdminResponseDto>))]
         public async Task<IActionResult> GetUsers([FromQuery] int? Id, [FromQuery] PaginationFilter<AccountAdminResponseDto> filter)
         {
@@ -43,19 +43,7 @@ namespace MySchool.API.Controllers
             }
             return BuildResponse(accountService.GetAllAccounts(filter));
         }
-
-        /// <summary>
-        /// Delete an account by ID - Admin Only
-        /// </summary>
-        /// <param name="account_id">The ID of the account to delete</param>
-        /// <returns>The deleted account</returns>
-        [HttpDelete("{account_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountAdminResponseDto))]
-        public async Task<IActionResult> DeleteUser(int account_id)
-        {
-            return BuildResponse(await accountService.DeleteAccountByIdAsync(account_id));
-        }
-
+      
         /// <summary>
         /// Update an account by ID - Admin Only
         /// </summary>
@@ -63,10 +51,24 @@ namespace MySchool.API.Controllers
         /// <param name="account">The account to update</param>
         /// <returns>The updated account</returns>
         [HttpPatch("{account_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountAdminResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(AccountAdminResponseDto))]
         public async Task<IActionResult> UpdateUser(int account_id, AccountRequestDto account)
         {
             return BuildResponse(await accountService.UpdateAccountAsync(account_id, account));
         }
+
+        /// <summary>
+        /// Delete an account by ID - Admin Only
+        /// </summary>
+        /// <param name="account_id">The ID of the account to delete</param>
+        /// <returns>The deleted account</returns>
+        [HttpDelete("{account_id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(AccountAdminResponseDto))]
+        public async Task<IActionResult> DeleteUser(int account_id)
+        {
+            return BuildResponse(await accountService.DeleteAccountByIdAsync(account_id));
+        }
+
+
     }
 }

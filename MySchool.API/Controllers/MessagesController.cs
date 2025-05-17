@@ -50,7 +50,7 @@ namespace MySchool.API.Controllers
         /// <param name="message_id">The ID of the message to update</param>
         /// <param name="request">Message request</param>
         [HttpPatch("{message_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> UpdateMessage(int message_id, MessageRequestDto request)
         {
             return BuildResponse(await messageService.UpdateMessageAsync(message_id, request));
@@ -63,7 +63,7 @@ namespace MySchool.API.Controllers
         /// <param name="message_id">The ID of the message to delete</param>
         /// <returns>The deleted message</returns>
         [HttpDelete("{message_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteMessage(int message_id)
         {
             return BuildResponse(await messageService.DeleteMessageAsync(message_id));

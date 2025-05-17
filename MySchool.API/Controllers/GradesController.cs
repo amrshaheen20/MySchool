@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MySchool.API.Common;
 using MySchool.API.Extensions;
+using MySchool.API.Interfaces;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.GradeContainer;
 
@@ -36,7 +37,7 @@ namespace MySchool.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginateBlock<GradeResponseDto>))]
         [Authorize(Policy = Policies.AllUsers)]
-        public async Task<IActionResult> GetAll([FromQuery] int? id, [FromBody] PaginationFilter<GradeResponseDto> filter)
+        public async Task<IActionResult> GetAll([FromQuery] int? id, [FromQuery] PaginationFilter<GradeResponseDto> filter)
         {
             if (id != null)
             {
@@ -53,7 +54,7 @@ namespace MySchool.API.Controllers
         /// <param name="request">The updated grade information</param>
         /// <returns>The updated grade record</returns>
         [HttpPatch("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GradeResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Teacher)]
         public async Task<IActionResult> Update(int id, [FromBody] GradeRequestDto request)
         {
@@ -66,7 +67,7 @@ namespace MySchool.API.Controllers
         /// <param name="id">ID of the grade to delete</param>
         /// <returns>The deleted grade record</returns>
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GradeResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> Delete(int id)
         {
@@ -109,5 +110,19 @@ namespace MySchool.API.Controllers
             return BuildResponse(await gradeService.DeleteAllGradesAsync());
         }
 
+        /// <summary>
+        /// Get grades for a specific subject - Admin and Teacher Only 
+        /// </summary>
+        /// <param name="request">Subject filter parameters</param>
+        /// <param name="filter">Pagination filter</param>
+        /// <returns>Paginated list of subject grades</returns>
+        [HttpGet("subject-grades")]
+        [ProducesResponseType(typeof(IBaseResponse<PaginateBlock<SubjectGradesResponseDto>>), StatusCodes.Status200OK)]
+        [Authorize(Policy = Policies.Moderator)]
+        public IActionResult GetSubjectGrades([FromQuery] SubjectGradesRequestDto request, [FromQuery] PaginationFilter<SubjectGradesResponseDto> filter)
+        {
+            var response = gradeService.GetSubjectGradesById(request, filter);
+            return BuildResponse(response);
+        }
     }
 }

@@ -1,6 +1,6 @@
-﻿using MySchool.API.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
+using MySchool.API.Enums;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.SubjectEntities;
 using MySchool.API.Validators;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,6 +26,27 @@ namespace MySchool.API.Models.Dtos
     {
         public AccountResponseDto Student { get; set; } = default!;
         public SubjectResponseDto Subject { get; set; } = default!;
+        public int TermNumber { get; set; }
         public float Mark { get; set; }
+    }
+
+
+    public class SubjectGradesRequestDto
+    {
+        [Required]
+        [FromQuery]
+        public int SubjectId { get; set; }
+
+        [Required]
+        [FromQuery]
+        [Range(1, 2)]
+        public int Term { get; set; }
+    }
+
+
+    public class SubjectGradesResponseDto
+    {
+        public AccountResponseDto Student { get; set; } = default!;
+        public GradeResponseDto? Grade { get; set; } = default!;
     }
 }

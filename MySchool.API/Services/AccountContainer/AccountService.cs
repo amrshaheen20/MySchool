@@ -70,34 +70,14 @@ namespace MySchool.API.Services.AccountContainer
                 .SetData(GetRepository().Filter(filter));
         }
 
-
-        public async Task<IBaseResponse<AccountAdminResponseDto>> DeleteAccountByIdAsync(int accountId)
+        public async Task<IBaseResponse<object>> UpdateAccountAsync(int accountId, AccountRequestDto updatedAccount)
         {
             var userRepository = GetRepository();
             var userEntity = await userRepository.GetByIdAsync(accountId);
 
             if (userEntity == null)
             {
-                return new BaseResponse<AccountAdminResponseDto>()
-                    .SetStatus(HttpStatusCode.NotFound)
-                    .SetMessage("Account not found.");
-            }
-
-            userRepository.Delete(userEntity);
-
-            await unitOfWork.SaveAsync();
-            return new BaseResponse<AccountAdminResponseDto>()
-                .SetData(mapper.Map<AccountAdminResponseDto>(userEntity));
-        }
-
-        public async Task<IBaseResponse<AccountAdminResponseDto>> UpdateAccountAsync(int accountId, AccountRequestDto updatedAccount)
-        {
-            var userRepository = GetRepository();
-            var userEntity = await userRepository.GetByIdAsync(accountId);
-
-            if (userEntity == null)
-            {
-                return new BaseResponse<AccountAdminResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
                     .SetMessage("Account not found.");
             }
@@ -107,8 +87,29 @@ namespace MySchool.API.Services.AccountContainer
             userRepository.Update(userEntity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse<AccountAdminResponseDto>()
-                .SetData(mapper.Map<AccountAdminResponseDto>(userEntity));
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Account updated successfully.");
+        }
+
+        public async Task<IBaseResponse<object>> DeleteAccountByIdAsync(int accountId)
+        {
+            var userRepository = GetRepository();
+            var userEntity = await userRepository.GetByIdAsync(accountId);
+
+            if (userEntity == null)
+            {
+                return new BaseResponse()
+                    .SetStatus(HttpStatusCode.NotFound)
+                    .SetMessage("Account not found.");
+            }
+
+            userRepository.Delete(userEntity);
+
+            await unitOfWork.SaveAsync();
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Account deleted successfully.");
         }
 
         #region Auth

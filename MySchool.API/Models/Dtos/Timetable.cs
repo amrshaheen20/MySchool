@@ -1,6 +1,4 @@
 ﻿using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
-using MySchool.API.Models.DbSet.SubjectEntities;
 using MySchool.API.Validators;
 using System.ComponentModel.DataAnnotations;
 

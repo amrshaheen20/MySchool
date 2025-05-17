@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
-using MySchool.API.Models.DbSet.SubjectEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Validators;
 using System.ComponentModel.DataAnnotations;
 
@@ -56,8 +55,7 @@ namespace MySchool.API.Models.Dtos
         public ClassResponseDto Class { get; set; } = default!;
         public SubjectResponseDto Subject { get; set; } = default!;
         public bool IsActive { get; set; } = true;
-        public float Mark { get; set; }
-        public bool IsDeadlinePassed { get; set; } = false;
+        public bool IsDeadlinePassed  => Deadline < DateTime.UtcNow;
     }
 
     public class AssignmentSubmissionResponseDto : BaseResponseDto

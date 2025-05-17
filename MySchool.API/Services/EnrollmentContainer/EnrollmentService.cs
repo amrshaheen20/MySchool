@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MySchool.API.Common;
 using MySchool.API.Interfaces;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.EnrollmentContainer.Injector;
 using System.Net;
@@ -89,7 +89,7 @@ namespace MySchool.API.Services.EnrollmentContainer
             repository.Delete(entity);
             await unitOfWork.SaveAsync();
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("Enrollment deleted successfully.");
         }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySchool.API.Enums;
-using MySchool.API.Models.DbSet.ExamEntities;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 namespace MySchool.API.Models.DbSet
 {
@@ -13,10 +13,14 @@ namespace MySchool.API.Models.DbSet
         [StringLength(255)]
         public required string UserName { get; set; }
         public required eRole Role { get; set; }
-      
+
         [StringLength(500)]
         public required string PasswordHash { get; set; }
+
+        [DefaultValue(true)]
         public bool MustChangePassword { get; set; } = true;
+
+        [DefaultValue(false)]
         public bool IsActive { get; set; } = false;
         [StringLength(255)]
         public string? NationalId { get; set; }
@@ -26,6 +30,8 @@ namespace MySchool.API.Models.DbSet
         public string? Address { get; set; }
         [StringLength(255)]
         public string? PhoneNumber { get; set; }
+
+        [DefaultValueSql("getutcdate()")]
         public DateTime LastActiveTime { get; set; }
 
         //public virtual ICollection<UserCustomFields> CustomFields { get; set; } = new List<UserCustomFields>();
@@ -59,6 +65,9 @@ namespace MySchool.API.Models.DbSet
 
             builder.HasIndex(x => x.UserName).IsUnique();
             //builder.HasIndex(x => x.NationalId).IsUnique();
+            builder.HasIndex(x => x.IsActive);
+            builder.HasIndex(x => x.MustChangePassword);
+            builder.HasIndex(x => x.Role);
 
 
             builder.HasMany(x => x.ConversationsInitiated)

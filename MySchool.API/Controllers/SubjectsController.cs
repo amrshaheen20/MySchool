@@ -52,7 +52,7 @@ namespace MySchool.API.Controllers
         /// <param name="subject_id">The ID of the subject to delete</param>
         /// <returns>The deleted subject</returns>
         [HttpDelete("{subject_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SubjectResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> DeleteSubject(int subject_id)
         {
@@ -66,7 +66,7 @@ namespace MySchool.API.Controllers
         /// <param name="subject">The subject to update</param>
         /// <returns>The updated subject</returns>
         [HttpPatch("{subject_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> UpdateSubject(int subject_id, SubjectRequestDto subject)
         {

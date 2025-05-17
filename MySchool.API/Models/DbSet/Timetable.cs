@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MySchool.API.Models.DbSet.SubjectEntities;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace MySchool.API.Models.DbSet.ClassRoomEntities
+namespace MySchool.API.Models.DbSet
 {
     public class Timetable : BaseEntity
     {
@@ -18,7 +18,8 @@ namespace MySchool.API.Models.DbSet.ClassRoomEntities
         public TimeOnly StartTime { get; set; }
         [Required]
         public TimeOnly EndTime { get; set; }
-        [Required]
+
+        [DefaultValue(false)]
         public bool isBreak { get; set; } = false;
 
         public virtual ClassRoom ClassRoom { get; set; } = default!;
@@ -31,7 +32,9 @@ namespace MySchool.API.Models.DbSet.ClassRoomEntities
         public void Configure(EntityTypeBuilder<Timetable> builder)
         {
             builder.HasIndex(x => new { x.ClassRoomId, x.Day, x.StartTime, x.EndTime }).IsUnique();
-
+            builder.HasIndex(x => x.ClassRoomId);
+            builder.HasIndex(x => x.SubjectId);
+            builder.HasIndex(x => x.TeacherId);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace MySchool.API.Controllers
         /// <param name="assignmentDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AssignmentResponseDto))]
         [Consumes("multipart/form-data")]
         [Authorize(Policy = Policies.Teacher)]
         public async Task<IActionResult> PostAssignment([FromForm] AssignmentRequestDto assignmentDto)
@@ -58,7 +58,7 @@ namespace MySchool.API.Controllers
         /// <param name="assignmentDto"></param>
         /// <returns></returns>
         [HttpPatch("{assignment_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Teacher)]
         public async Task<IActionResult> UpdateAssignment(int assignment_id, [FromForm] AssignmentRequestDto assignmentDto)
         {
@@ -73,7 +73,7 @@ namespace MySchool.API.Controllers
         /// <param name="assignment_id"></param>
         /// <returns></returns> 
         [HttpDelete("{assignment_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> DeleteAssignment(int assignment_id)
         {
@@ -130,7 +130,7 @@ namespace MySchool.API.Controllers
         /// </summary>
 
         [HttpDelete("{assignment_id}/Submissions/{submissions_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> DeleteAssignmentSubmissions(int assignment_id, int submissions_id)
         {

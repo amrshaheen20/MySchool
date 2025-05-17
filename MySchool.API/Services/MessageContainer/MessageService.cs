@@ -140,7 +140,7 @@ namespace MySchool.API.Services.MessageContainer
                 });
 
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("Message updated successfully.");
         }
 
@@ -179,7 +179,7 @@ namespace MySchool.API.Services.MessageContainer
 
 
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("Message deleted successfully.");
 
         }

@@ -17,7 +17,7 @@ namespace MySchool.API.Controllers
         /// </summary>
         /// <param name="announcementDto">Announcement to create</param>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnnouncementResponseDto))]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> PostAnnouncement(AnnouncementRequestDto announcementDto)
         {
@@ -55,7 +55,7 @@ namespace MySchool.API.Controllers
         /// <param name="announcement_id">The ID of the announcement to delete</param>
         /// <returns></returns> 
         [HttpDelete("{announcement_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> DeleteAnnouncement(int announcement_id)
         {

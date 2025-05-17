@@ -4,7 +4,6 @@ using MySchool.API.Enums;
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 
 namespace MySchool.API.Services.EnrollmentContainer.Injector
 {
@@ -43,7 +42,7 @@ namespace MySchool.API.Services.EnrollmentContainer.Injector
             AddCommand(q => q.OrderByDescending(x => x.Id));
         }
 
-        public void IncludeSTudent()
+        public void IncludeStudents()
         {
             AddCommand(q => q.Include(x => x.Student)
             //.ThenInclude(x => x.CustomFields)

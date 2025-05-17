@@ -36,7 +36,7 @@ namespace MySchool.API.Extensions
                         response.SetMessage(memes[Random.Shared.Next(memes.Length)]);
                     }
                     context.Response.StatusCode = statusCode;
-                    await context.Response.WriteAsJsonAsync(response);
+                    await context.Response.WriteAsJsonAsync(response, ApiExtensions.JsonSerializerOptions);
                 });
             });
         }

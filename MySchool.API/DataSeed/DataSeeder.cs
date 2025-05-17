@@ -1,9 +1,7 @@
 ﻿using Bogus;
 using MySchool.API.Enums;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Models.DbSet.ExamEntities;
-using MySchool.API.Models.DbSet.SubjectEntities;
 
 namespace MySchool.API.DataSeed
 {

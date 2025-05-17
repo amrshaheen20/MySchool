@@ -27,6 +27,9 @@ namespace MySchool.API.Models.DbSet
     {
         public void Configure(EntityTypeBuilder<Fee> builder)
         {
+            builder.HasIndex(x => x.StudentId);
+            builder.HasIndex(x => x.CreatedById);
+
             builder.Property(f => f.TotalAmount).HasPrecision(18, 2);
             builder.Property(f => f.PaidAmount).HasPrecision(18, 2);
 

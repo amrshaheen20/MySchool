@@ -43,7 +43,7 @@ namespace MySchool.API.Controllers
         /// <param name="enrollment_id">The enrollment record ID</param>
         /// <returns>Status of the unenrollment operation</returns>
         [HttpDelete("{enrollment_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> RemoveEnrollment(int enrollment_id)
         {

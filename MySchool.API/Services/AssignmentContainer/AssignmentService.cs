@@ -3,7 +3,7 @@ using AutoMapper.QueryableExtensions;
 using MySchool.API.Common;
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.DbSet.ExamEntities;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.AssignmentContainer.Injector;
@@ -83,21 +83,22 @@ namespace MySchool.API.Services.AssignmentContainer
                 .SetData(GetRepository().Filter(filter));
         }
 
-        public async Task<IBaseResponse<AssignmentResponseDto>> UpdateAssignment(int assignmentId, AssignmentRequestDto requestDto)
+        public async Task<IBaseResponse<object>> UpdateAssignment(int assignmentId, AssignmentRequestDto requestDto)
         {
             var assignmentEntity = await GetRepository().GetByIdAsync(assignmentId);
             if (assignmentEntity == null)
             {
-                return new BaseResponse<AssignmentResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
-                    .SetMessage("Assignment not found");
+                    .SetMessage("Assignment not found.");
             }
             mapper.Map(requestDto, assignmentEntity);
             assignmentEntity.FilePath = requestDto.Attachment != null ? fileStorage.SaveFile(requestDto.Attachment!) : assignmentEntity.FilePath;
             await unitOfWork.SaveAsync();
-            return new BaseResponse<AssignmentResponseDto>()
-                .SetStatus(HttpStatusCode.OK)
-                .SetData(mapper.Map<AssignmentResponseDto>(assignmentEntity));
+          
+            return new BaseResponse()
+                           .SetStatus(HttpStatusCode.NoContent)
+                           .SetMessage("Assignment updated successfully.");
         }
 
         public async Task<IBaseResponse<object>> DeleteAssignment(int assignmentId)
@@ -114,7 +115,8 @@ namespace MySchool.API.Services.AssignmentContainer
             fileStorage.DeleteFile(assignmentEntity.FilePath);
             await unitOfWork.SaveAsync();
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.NoContent);
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Assignment deleted successfully.");
         }
 
         //send submissions
@@ -141,8 +143,7 @@ namespace MySchool.API.Services.AssignmentContainer
             {
                 AssignmentId = assignmentId,
                 StudentId = contextAccessor.GetUserId(),
-                FilePath = fileStorage.SaveFile(requestDto.Attachment!),
-                CreatedById = contextAccessor.GetUserId(),
+                FilePath = fileStorage.SaveFile(requestDto.Attachment!)
             };
 
 
@@ -301,7 +302,7 @@ namespace MySchool.API.Services.AssignmentContainer
             await unitOfWork.SaveAsync();
             return new BaseResponse()
                 .SetStatus(HttpStatusCode.NoContent)
-                .SetMessage("Submissions deleted successfully");
+                .SetMessage("Submissions deleted successfully.");
         }
     }
 

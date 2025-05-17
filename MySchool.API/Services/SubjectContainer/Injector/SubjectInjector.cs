@@ -2,7 +2,6 @@
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.SubjectEntities;
 
 namespace MySchool.API.Services.SubjectContainer.Injector
 {

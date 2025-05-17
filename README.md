@@ -1,13 +1,16 @@
-# MySchool API 
+# MySchool API
 
 **MySchool API** is a school management system built using **ASP.NET Core Web API**. It provides RESTful endpoints for managing assignments, users, and dashboards based on user roles (Admin, Teacher, Student, Guardian).
 
+## 🔗 Live Demo
 
-## **Database Diagram**
+Access the Swagger UI here: [http://my-shcool.runasp.net/swagger](http://my-shcool.runasp.net/swagger)
+
+## 📊 Database Diagram
+
 ![Database Diagram](Assets/database-diagram.png)
 
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 

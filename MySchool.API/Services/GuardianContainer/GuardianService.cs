@@ -67,7 +67,7 @@ namespace MySchool.API.Services.GuardianContainer
             await unitOfWork.SaveAsync();
 
             return new BaseResponse<StudentGuardianResponseDto>()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("child removed from guardian");
         }
     }

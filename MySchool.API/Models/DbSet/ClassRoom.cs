@@ -3,14 +3,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySchool.API.Models.DbSet.ExamEntities;
 using System.ComponentModel.DataAnnotations;
 
-namespace MySchool.API.Models.DbSet.ClassRoomEntities
+namespace MySchool.API.Models.DbSet
 {
     public class ClassRoom : BaseEntity
     {
-        [Required, StringLength(255)]
+        [StringLength(255)]
         public required string Name { get; set; }
 
-        [Required]
         public required int Grade { get; set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
@@ -24,6 +23,7 @@ namespace MySchool.API.Models.DbSet.ClassRoomEntities
         public void Configure(EntityTypeBuilder<ClassRoom> builder)
         {
             builder.HasIndex(x => new { x.Name, x.Grade }).IsUnique();
+
             builder.HasMany(x => x.Enrollments)
                    .WithOne(x => x.ClassRoom)
                    .HasForeignKey(x => x.ClassRoomId)

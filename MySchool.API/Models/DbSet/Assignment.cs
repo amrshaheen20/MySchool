@@ -1,29 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
-using MySchool.API.Models.DbSet.SubjectEntities;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MySchool.API.Models.DbSet.ExamEntities
 {
     public class Assignment : BaseEntity
     {
-        [Required]
         [MaxLength(100)]
-        public string Title { get; set; } = string.Empty;
+        public required string Title { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(255)]
-        public string FilePath { get; set; } = string.Empty;
+        public required string FilePath { get; set; } = string.Empty;
 
-        [Required]
-        public DateTime Deadline { get; set; }
+        public required DateTime Deadline { get; set; }
         public int ClassRoomId { get; set; }
 
         public int? CreatedById { get; set; }
         public int SubjectId { get; set; }
+      
+        [DefaultValue(true)]
         public bool IsActive { get; set; } = true;
-        public float Mark { get; set; }
+        public required float Mark { get; set; }
 
         public virtual ClassRoom ClassRoom { get; set; } = default!;
         public virtual User? CreatedBy { get; set; } = default!;
@@ -38,14 +36,13 @@ namespace MySchool.API.Models.DbSet.ExamEntities
         {
             builder.HasIndex(x => new { x.ClassRoomId, x.SubjectId, x.Title }).IsUnique();
 
+            builder.HasIndex(x => x.ClassRoomId);
             builder.HasIndex(x => x.CreatedById);
             builder.HasIndex(x => x.SubjectId);
 
+            builder.Property(x => x.FilePath)
+                .IsUnicode(false);
 
-            builder.Property(x => x.FilePath).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Title).IsRequired().HasMaxLength(100);
-            builder.Property(x => x.Deadline).IsRequired();
-            builder.Property(x => x.Mark).IsRequired();
 
             builder.HasMany(x => x.Submissions)
                 .WithOne(x => x.Assignment)
@@ -56,10 +53,6 @@ namespace MySchool.API.Models.DbSet.ExamEntities
                 .WithMany()
                 .HasForeignKey(x => x.CreatedById)
                 .OnDelete(DeleteBehavior.SetNull);
-
-
-
-
         }
     }
 }

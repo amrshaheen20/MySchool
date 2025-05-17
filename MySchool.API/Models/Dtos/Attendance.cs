@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySchool.API.Enums;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Validators;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,8 +25,8 @@ namespace MySchool.API.Models.Dtos
 
     public class AttendanceResponseDto : BaseResponseDto
     {
-        public int StudentId { get; set; }
-        public int ClassId { get; set; }
+        public AccountResponseDto Student { get; set; } = default!;
+        public ClassResponseDto Class { get; set; } = default!;
         public DateOnly Date { get; set; }
         public eAttendanceStatus Status { get; set; }
         public string? Note { get; set; }

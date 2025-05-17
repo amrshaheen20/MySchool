@@ -43,30 +43,31 @@ namespace MySchool.API.Controllers
         }
 
         /// <summary>
-        /// Delete a timetable by ID - Admin Only
-        /// </summary>
-        /// <param name="timetable_id">The ID of the timetable to delete</param>
-        /// <returns>The deleted timetable</returns>
-        [HttpDelete("{timetable_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TimeTableResponseDto))]
-        [Authorize(Policy = Policies.Admin)]
-        public async Task<IActionResult> DeleteTimeTable(int timetable_id)
-        {
-            return BuildResponse(await timetableService.DeleteTimeTableByIdAsync(timetable_id));
-        }
-
-        /// <summary>
         /// Update a timetable by ID - Admin Only
         /// </summary>
         /// <param name="timetable_id">The ID of the timetable to update</param>
         /// <param name="timetable">The timetable data to update</param>
         /// <returns>The updated timetable</returns>
         [HttpPatch("{timetable_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TimeTableResponseDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Admin)]
         public async Task<IActionResult> UpdateTimeTable(int timetable_id, [FromBody] TimeTableRequestDto timetable)
         {
             return BuildResponse(await timetableService.UpdateTimeTableAsync(timetable_id, timetable));
+        }
+
+
+        /// <summary>
+        /// Delete a timetable by ID - Admin Only
+        /// </summary>
+        /// <param name="timetable_id">The ID of the timetable to delete</param>
+        /// <returns>The deleted timetable</returns>
+        [HttpDelete("{timetable_id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Authorize(Policy = Policies.Admin)]
+        public async Task<IActionResult> DeleteTimeTable(int timetable_id)
+        {
+            return BuildResponse(await timetableService.DeleteTimeTableByIdAsync(timetable_id));
         }
     }
 }

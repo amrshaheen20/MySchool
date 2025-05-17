@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MySchool.API.Models.DbSet.SubjectEntities;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MySchool.API.Models.DbSet
@@ -15,6 +15,7 @@ namespace MySchool.API.Models.DbSet
         [Range(1, 2)]
         public required int TermNumber { get; set; }
 
+        [DefaultValue(0)]
         public required float Mark { get; set; } = 0;
         public bool IsPublished { get; set; } = false;
         public virtual User Student { get; set; } = default!;
@@ -28,6 +29,11 @@ namespace MySchool.API.Models.DbSet
         public void Configure(EntityTypeBuilder<Grade> builder)
         {
             builder.HasIndex(x => new { x.StudentId, x.SubjectId }).IsUnique();
+            builder.HasIndex(x => x.StudentId);
+            builder.HasIndex(x => x.SubjectId);
+            builder.HasIndex(x => x.CreatedById);
+
+
             builder.Property(x => x.IsPublished).HasDefaultValue(false);
 
             builder.HasOne(g => g.Student)

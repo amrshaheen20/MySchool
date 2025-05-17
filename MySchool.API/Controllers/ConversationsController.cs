@@ -50,7 +50,7 @@ namespace MySchool.API.Controllers
         /// <param name="conversation_id">The ID of the conversation to delete</param>
         /// <returns>The deleted conversation</returns>
         [HttpDelete("{conversation_id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteConversation(int conversation_id)
         {
             return BuildResponse(await conversationService.RemoveConversationAsync(conversation_id));

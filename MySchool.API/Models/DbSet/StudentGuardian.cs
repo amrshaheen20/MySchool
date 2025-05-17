@@ -22,6 +22,10 @@ namespace MySchool.API.Models.DbSet
             builder.ToTable("Guardians");
             builder.HasIndex(x => new { x.StudentId, x.GuardianId }).IsUnique();
 
+            builder.HasIndex(x => x.StudentId);
+            builder.HasIndex(x => x.GuardianId);
+
+
             builder.HasOne(g => g.Student)
                 .WithMany()
                 .HasForeignKey(g => g.StudentId)

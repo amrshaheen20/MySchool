@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MySchool.API.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace MySchool.API.Models.DbSet.ClassRoomEntities
+namespace MySchool.API.Models.DbSet
 {
     public class Attendance : BaseEntity
     {

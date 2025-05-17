@@ -6,7 +6,6 @@ using MySchool.API.Extensions;
 using MySchool.API.Hubs;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.AccountContainer.Injector;
 using MySchool.API.Services.ConversationContainer.Injector;
@@ -109,7 +108,7 @@ namespace MySchool.API.Services.ConversationContainer
             repository.Delete(entity);
             await unitOfWork.SaveAsync();
             return new BaseResponse()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("Conversation deleted successfully.");
 
         }

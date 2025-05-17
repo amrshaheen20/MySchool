@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MySchool.API.Common;
 using MySchool.API.Interfaces;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.TimeTableContainer.Injector;
 using System.Net;
@@ -65,26 +65,26 @@ namespace MySchool.API.Services.TimeTableContainer
 
             await unitOfWork.SaveAsync();
             return new BaseResponse<object>()
-                .SetStatus(HttpStatusCode.OK)
+                .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("Timetable updated successfully.");
         }
 
-        public async Task<IBaseResponse<ClassResponseDto>> DeleteTimeTableByIdAsync(int TimetableId)
+        public async Task<IBaseResponse<object>> DeleteTimeTableByIdAsync(int TimetableId)
         {
             var repository = GetRepository();
             var entity = await repository.GetByIdAsync(TimetableId);
             if (entity == null)
             {
-                return new BaseResponse<ClassResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
                     .SetMessage("Timetable not found.");
             }
 
             repository.Delete(entity);
             await unitOfWork.SaveAsync();
-            return new BaseResponse<ClassResponseDto>()
-                .SetStatus(HttpStatusCode.OK)
-                .SetMessage("Timetable removed successfully.");
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Timetable deleted successfully.");
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 
 namespace MySchool.API.Services.ClassContainer.Mapper

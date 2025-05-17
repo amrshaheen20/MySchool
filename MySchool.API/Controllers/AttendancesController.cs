@@ -57,6 +57,7 @@ namespace MySchool.API.Controllers
         /// <param name="requestDto">The attendance request</param>
         /// <returns>The updated attendance</returns>
         [HttpPatch("{attendance_id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> UpdateAttendanceStatus(int attendance_id, AttendanceRequestDto requestDto)
         {
@@ -69,6 +70,7 @@ namespace MySchool.API.Controllers
         /// <param name="attendance_id">The ID of the attendance to delete</param>
         /// <returns>The deleted attendance</returns>
         [HttpDelete("{attendance_id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Policy = Policies.Moderator)]
         public async Task<IActionResult> DeleteAttendance(int attendance_id)
         {

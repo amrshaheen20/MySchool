@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MySchool.API.Common;
 using MySchool.API.Interfaces;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
+using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
 using MySchool.API.Services.ClassContainer.Injector;
 using System.Net;
@@ -53,32 +53,15 @@ namespace MySchool.API.Services.ClassContainer
         }
 
 
-        public async Task<IBaseResponse<ClassResponseDto>> DeleteClassByIdAsync(int ClassId)
+
+        public async Task<IBaseResponse<object>> UpdateClassAsync(int ClassId, ClassRequestDto updatedClass)
         {
             var Repository = GetRepository();
             var Entity = await Repository.GetByIdAsync(ClassId);
 
             if (Entity == null)
             {
-                return new BaseResponse<ClassResponseDto>()
-                    .SetStatus(HttpStatusCode.NotFound)
-                    .SetMessage("Class not found.");
-            }
-
-            Repository.Delete(Entity);
-            await unitOfWork.SaveAsync();
-            return new BaseResponse<ClassResponseDto>()
-                .SetData(mapper.Map<ClassResponseDto>(Entity));
-        }
-
-        public async Task<IBaseResponse<ClassResponseDto>> UpdateClassAsync(int ClassId, ClassRequestDto updatedClass)
-        {
-            var Repository = GetRepository();
-            var Entity = await Repository.GetByIdAsync(ClassId);
-
-            if (Entity == null)
-            {
-                return new BaseResponse<ClassResponseDto>()
+                return new BaseResponse()
                     .SetStatus(HttpStatusCode.NotFound)
                     .SetMessage("Class not found.");
             }
@@ -87,8 +70,28 @@ namespace MySchool.API.Services.ClassContainer
             Repository.Update(Entity);
             await unitOfWork.SaveAsync();
 
-            return new BaseResponse<ClassResponseDto>()
-                .SetData(mapper.Map<ClassResponseDto>(Entity));
+            return new BaseResponse()
+                .SetStatus(HttpStatusCode.NoContent)
+                .SetMessage("Class updated successfully.");
+        }
+
+        public async Task<IBaseResponse<object>> DeleteClassByIdAsync(int ClassId)
+        {
+            var Repository = GetRepository();
+            var Entity = await Repository.GetByIdAsync(ClassId);
+
+            if (Entity == null)
+            {
+                return new BaseResponse()
+                    .SetStatus(HttpStatusCode.NotFound)
+                    .SetMessage("Class not found.");
+            }
+
+            Repository.Delete(Entity);
+            await unitOfWork.SaveAsync();
+            return new BaseResponse()
+                 .SetStatus(HttpStatusCode.NoContent)
+                 .SetMessage("Class deleted successfully.");
         }
 
     }

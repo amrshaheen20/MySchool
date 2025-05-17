@@ -20,7 +20,7 @@ namespace MySchool.API.Models.Dtos
     {
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
-        public int UserId { get; set; }
+        public AccountResponseDto User { get; set; } = default!;
         public DateTime time { get; set; }
     }
 }

@@ -41,6 +41,8 @@ namespace MySchool.API.Models.DbSet
                  .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(x => new { x.UserOneId, x.UserTwoId }).IsUnique();
+            builder.HasIndex(x => x.UserOneId);
+            builder.HasIndex(x => x.UserTwoId);
         }
     }
 }

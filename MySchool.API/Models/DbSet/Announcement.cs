@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 
 namespace MySchool.API.Models.DbSet
@@ -8,12 +8,12 @@ namespace MySchool.API.Models.DbSet
     {
         public int UserId { get; set; }
         public int? CreatedById { get; set; }
-        [Required]
+
         [StringLength(100)]
-        public string Title { get; set; } = string.Empty;
-        [Required]
+        public required string Title { get; set; } = string.Empty;
+
         [StringLength(500)]
-        public string Content { get; set; } = string.Empty;
+        public required string Content { get; set; } = string.Empty;
 
         public virtual User User { get; set; } = default!;
         public virtual User? CreatedBy { get; set; } = default!;
@@ -23,6 +23,9 @@ namespace MySchool.API.Models.DbSet
     {
         public void Configure(EntityTypeBuilder<Announcement> builder)
         {
+            builder.HasIndex(a => a.UserId);
+            builder.HasIndex(a => a.CreatedById);
+
             builder.HasOne(g => g.User)
              .WithMany(x => x.Announcements)
              .HasForeignKey(g => g.UserId)

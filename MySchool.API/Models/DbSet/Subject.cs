@@ -1,11 +1,10 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MySchool.API.Models.DbSet.ClassRoomEntities;
 using MySchool.API.Models.DbSet.ExamEntities;
 using System.ComponentModel.DataAnnotations;
 
-namespace MySchool.API.Models.DbSet.SubjectEntities
+namespace MySchool.API.Models.DbSet
 {
     public class Subject : BaseEntity
     {
@@ -23,7 +22,6 @@ namespace MySchool.API.Models.DbSet.SubjectEntities
     {
         public void Configure(EntityTypeBuilder<Subject> builder)
         {
-            builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
 
             builder.HasMany(x => x.Assignments)
                 .WithOne(x => x.Subject)
