@@ -2,6 +2,7 @@
 
 namespace MySchool.API.Services.Common
 {
+    // TODO: Refactor this logic to improve how files are retrieved from the API and sent
     public class FileStorageService(IConfiguration configuration) : IServiceInjector
     {
         const string defaultFileDirectory = "Files";
@@ -25,7 +26,7 @@ namespace MySchool.API.Services.Common
                     throw new ArgumentException("Invalid file");
 
                 var safeFileName = Path.GetFileName(file.FileName);
-                var uniqueFileName = $"{Guid.NewGuid()}";
+                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
                 var filePath = GetFilePath(uniqueFileName);
 
