@@ -87,19 +87,22 @@ namespace MySchool.API.Common
 
         private IQueryable<TResponse> ApplySearchQuery(IQueryable<TResponse> query)
         {
-            var properties = typeof(TResponse).GetProperties()
-                .Where(p => p.PropertyType == typeof(string))
-                .ToList();
-
-            if (!properties.Any())
+            if (string.IsNullOrWhiteSpace(Query))
                 return query;
+
+            var propertyPaths = GetStringPropertyPaths(typeof(TResponse));
+            if (!propertyPaths.Any())
+                return query.Where(x => false);
 
             var parameter = Expression.Parameter(typeof(TResponse), "x");
             Expression? searchExpression = null;
 
-            foreach (var property in properties)
+            foreach (var path in propertyPaths)
             {
-                var propertyAccess = Expression.Property(parameter, property);
+                var propertyAccess = BuildPropertyPathExpression(parameter, path);
+                if (propertyAccess == null || propertyAccess.Type != typeof(string))
+                    continue;
+
                 var searchValue = Expression.Constant(Query);
                 var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
 
@@ -113,7 +116,7 @@ namespace MySchool.API.Common
             }
 
             if (searchExpression == null)
-                return query;
+                return query.Where(x => false);
 
             var lambda = Expression.Lambda<Func<TResponse, bool>>(searchExpression, parameter);
             return query.Where(lambda);
@@ -149,7 +152,7 @@ namespace MySchool.API.Common
                 return query.Where(lambda);
             }
 
-            return query;
+            return query.Where(x => false);
         }
 
         private Expression BuildCondition(Expression propertyAccess, string value)
@@ -282,6 +285,33 @@ namespace MySchool.API.Common
 
             return expression;
         }
+
+        private List<string> GetStringPropertyPaths(Type type, string prefix = "")
+        {
+            var paths = new List<string>();
+
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var propPath = string.IsNullOrEmpty(prefix) ? prop.Name : $"{prefix}.{prop.Name}";
+
+                if (prop.PropertyType == typeof(string))
+                {
+                    paths.Add(propPath);
+                }
+                else if (!prop.PropertyType.IsPrimitive &&
+                         prop.PropertyType != typeof(DateTime) &&
+                         !prop.PropertyType.IsEnum &&
+                         !prop.PropertyType.IsGenericType &&
+                         !prop.PropertyType.IsArray &&
+                         prop.PropertyType.Assembly == type.Assembly)
+                {
+                    paths.AddRange(GetStringPropertyPaths(prop.PropertyType, propPath));
+                }
+            }
+
+            return paths;
+        }
+
 
     }
 

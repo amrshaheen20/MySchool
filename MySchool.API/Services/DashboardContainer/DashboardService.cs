@@ -24,6 +24,8 @@ namespace MySchool.API.Services.DashboardContainer
         private IGenericRepository<Enrollment> EnrollmentRepo => unitOfWork.GetRepository<Enrollment>();
         private IGenericRepository<Fee> FeeRepo => unitOfWork.GetRepository<Fee>();
         private IGenericRepository<Timetable> TimetableRepo => unitOfWork.GetRepository<Timetable>();
+        private IGenericRepository<Subject> SubjectRepo => unitOfWork.GetRepository<Subject>();
+
         private IGenericRepository<StudentGuardian> genericRepository => unitOfWork.GetRepository<StudentGuardian>();
 
         public async Task<IBaseResponse<StudentDashboardResponseDto>> GetStudentDashboardAsync(int StudentId)
@@ -186,7 +188,10 @@ namespace MySchool.API.Services.DashboardContainer
             var totalClasses = ClassRoomRepo.GetAll().Count();
 
             // Count total subjects
-            var totalSubjects = TimetableRepo.GetAll().Count();
+            var totalSubjects = SubjectRepo.GetAll().Count();
+
+            // Count total timetables
+            var totalTimetables = TimetableRepo.GetAll().Count();
 
             // Count total notifications/announcements
             var totalNotifications = AnnouncementRepo.GetAll().Count();
@@ -213,6 +218,7 @@ namespace MySchool.API.Services.DashboardContainer
                 TotalTeachers = totalTeachers,
                 TotalClasses = totalClasses,
                 TotalSubjects = totalSubjects,
+                TotalTimetables = totalTimetables,
                 TotalNotifications = totalNotifications,
                 TotalFeesCollected = totalFeesCollected,
                 TotalFeesRemaining = totalFeesRemaining,

@@ -93,6 +93,7 @@ internal class Program
 
 
         app.UseHttpsRedirection();
+        app.UseStaticFiles();
         app.UseAuthentication();
         app.UseMiddleware<ForcePasswordChangeMiddleware>();
         app.UseAuthorization();

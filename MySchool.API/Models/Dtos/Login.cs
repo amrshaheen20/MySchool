@@ -10,10 +10,9 @@ namespace MySchool.API.Models.Dtos
 
     public class LoginResponseDto
     {
-        public required string UserName { get; set; }
         public required string Token { get; set; }
-        public required DateTime Expiration { get; set; }
-        public required bool MustChangePassword { get; set; }
+        public required DateTime Expiration { get; set; }   
+        public required AccountAdminResponseDto User { get; set; } = default!;
     }
 
     public class ChangePasswordRequestDto

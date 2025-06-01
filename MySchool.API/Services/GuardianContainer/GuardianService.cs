@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MySchool.API.Common;
+using MySchool.API.Enums;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
 using MySchool.API.Models.Dtos;
+using MySchool.API.Services.AccountContainer.Injector;
 using MySchool.API.Services.GuardianContainer.Injector;
 using System.Net;
 
@@ -11,7 +14,8 @@ namespace MySchool.API.Services.GuardianContainer
     public class GuardianService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        StudentGuardianInjector guardianInjector
+        StudentGuardianInjector guardianInjector,
+        AccountInjector accountInjector
         ) : IServiceInjector
     {
         private IGenericRepository<StudentGuardian> GetRepository()
@@ -69,6 +73,26 @@ namespace MySchool.API.Services.GuardianContainer
             return new BaseResponse<StudentGuardianResponseDto>()
                 .SetStatus(HttpStatusCode.NoContent)
                 .SetMessage("child removed from guardian");
+        }
+
+
+        public IBaseResponse<PaginateBlock<GuardianResponseDto>> GetGuardians(PaginationFilter<GuardianResponseDto> filter)
+        {
+            var Guardians = unitOfWork.GetRepository<User>()
+                .AddInjector(accountInjector.Where(q => q.Role == eRole.Guardian)).GetAll().ProjectTo<AccountResponseDto>(mapper.ConfigurationProvider);
+
+            var AllStudents = GetRepository().GetAll();
+
+            var Result = Guardians.Select(guardian => new GuardianResponseDto()
+            {
+                Guardian = guardian,
+                TotalChildren = AllStudents.Where(q => q.GuardianId == guardian.Id).Count()
+            });
+
+
+            return new BaseResponse<PaginateBlock<GuardianResponseDto>>()
+                .SetStatus(HttpStatusCode.OK)
+                .SetData(filter.Apply(Result));
         }
     }
 }

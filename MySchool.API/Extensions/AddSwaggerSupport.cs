@@ -165,8 +165,15 @@ namespace MySchool.API.Extensions
 
             var version = swaggerSettings.GetValue<string>("Version") ?? "v1";
             var title = swaggerSettings.GetValue<string>("Title") ?? assemblyName;
-            var description = swaggerSettings.GetValue<string>("Description") ?? "";
 
+            var baseDescription = swaggerSettings.GetValue<string>("Description") ?? "";
+            var description = $"""
+{baseDescription}</br>
+</br>
+- Build Time (UTC): {BuildInfo.BuildTime} </br> 
+- Platform: {BuildInfo.Platform}  </br>
+- Framework: {BuildInfo.Framework}  </br>
+""";
 
 
             services.AddSwaggerGen(swagger =>

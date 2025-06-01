@@ -36,4 +36,32 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
+
+	<Target Name="GenerateBuildTimeFile" BeforeTargets="BeforeBuild">
+		<PropertyGroup>
+			<BuildTime>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</BuildTime>
+
+			<BuildInfoText>
+// -----------------------------------------------------------------------------
+// This file is auto-generated. Do not modify directly.
+//------------------------------------------------------------------------------
+using System.Runtime.InteropServices%3B
+public static class BuildInfo
+{
+public const string BuildTime = "$(BuildTime)"%3B
+public static string Platform =&gt;
+RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Windows" :
+RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "Linux" :
+RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macOS" : "Unknown"%3B
+
+public static string Framework =&gt; RuntimeInformation.FrameworkDescription%3B
+}
+			</BuildInfoText>
+		</PropertyGroup>
+
+		<WriteLinesToFile File="BuildInfo.cs" Lines="$(BuildInfoText)" Overwrite="true" Encoding="utf-8" />
+	</Target>
+
+
+
 </Project>

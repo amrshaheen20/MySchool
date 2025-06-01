@@ -12,7 +12,7 @@ namespace MySchool.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GuardianController(GuardianService guardianService) : BaseController
+    public class GuardiansController(GuardianService guardianService) : BaseController
     {
         /// <summary>
         /// Add a new child (student) under a guardian's account - Admin Only
@@ -69,6 +69,18 @@ namespace MySchool.API.Controllers
         public async Task<IActionResult> DeleteChild(int guardian_account_id, [FromRoute] int student_id)
         {
             return BuildResponse(await guardianService.DeleteChildAsync(guardian_account_id, student_id));
+        }
+
+        /// <summary>
+        /// Get All guardians - Admin Only
+        /// </summary>
+        /// <param name="filter">Pagination and filtering options</param>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginateBlock<GuardianResponseDto>))]
+        [Authorize(Policy = Policies.Admin)]
+        public IActionResult GetGuardians([FromQuery] PaginationFilter<GuardianResponseDto> filter)
+        {
+            return BuildResponse(guardianService.GetGuardians(filter));
         }
     }
 

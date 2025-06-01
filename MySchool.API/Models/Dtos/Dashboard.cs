@@ -52,6 +52,7 @@
         public required int TotalTeachers { get; set; }
         public required int TotalClasses { get; set; }
         public required int TotalSubjects { get; set; }
+        public required int TotalTimetables { get; set; }
 
         public required int TotalNotifications { get; set; }
 

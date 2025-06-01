@@ -223,10 +223,9 @@ namespace MySchool.API.Services.AccountContainer
             return new BaseResponse<LoginResponseDto>()
                 .SetData(new LoginResponseDto
                 {
-                    UserName = user.UserName,
                     Token = token.GenerateToken(),
                     Expiration = token.Token.ValidTo,
-                    MustChangePassword = user.MustChangePassword
+                    User = mapper.Map<AccountAdminResponseDto>(user)
                 });
         }
         #endregion

@@ -12,7 +12,7 @@ namespace MySchool.API.Models.DbSet
         public decimal PaidAmount { get; set; }
         public DateTime DueDate { get; set; }
         [StringLength(500)]
-        public string Description { get; set; } = default!;
+        public string? Description { get; set; } = default!;
 
         [NotMapped]
         public bool IsFullyPaid => PaidAmount >= TotalAmount;

@@ -16,8 +16,14 @@ namespace MySchool.API.Models.Dtos
 
     public class StudentGuardianResponseDto
     {
-        public int GuardianId { get; set; }
+        public AccountResponseDto Guardian { get; set; }= default!;
         public AccountResponseDto Student { get; set; } = default!;
         public string RelationToStudent { get; set; } = string.Empty;
+    }
+
+    public class GuardianResponseDto
+    {
+        public AccountResponseDto Guardian { get; set; } = default!;
+        public int TotalChildren { get; set; }
     }
 }

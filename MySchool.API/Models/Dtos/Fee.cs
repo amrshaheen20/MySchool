@@ -31,5 +31,7 @@ namespace MySchool.API.Models.Dtos
         public DateTime DueDate { get; set; }
         public bool IsPaid { get; set; }
         public DateTime PaidDate { get; set; }
+
+        public string Description { get; set; } = string.Empty;
     }
 }
