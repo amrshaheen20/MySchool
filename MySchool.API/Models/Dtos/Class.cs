@@ -20,5 +20,6 @@ namespace MySchool.API.Models.Dtos
         public required int Grade { get; set; }
 
         public int StudentCount { get; set; }
+        public int TotalTimetables { get; set; }
     }
 }

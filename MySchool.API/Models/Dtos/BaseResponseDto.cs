@@ -6,5 +6,8 @@ namespace MySchool.API.Models.Dtos
     {
         [JsonPropertyOrder(-1)]
         public int Id { get; set; }
+
+        [JsonPropertyOrder(1000)]
+        public DateTime CreatedAt { get; set; }
     }
 }

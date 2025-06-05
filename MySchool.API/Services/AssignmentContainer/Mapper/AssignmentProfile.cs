@@ -25,6 +25,9 @@ namespace MySchool.API.Services.AssignmentContainer.Mapper
                 .ForMember(
                     dest => dest.IsDeadlinePassed,
                     opt => opt.MapFrom(src => src.Deadline < DateTime.UtcNow)
+                ).ForMember(
+                    dest => dest.TotalSubmissions,
+                    opt => opt.MapFrom(src => src.Submissions.Count())
                 );
 
             CreateMap<AssignmentSubmission, AssignmentSubmissionResponseDto>();

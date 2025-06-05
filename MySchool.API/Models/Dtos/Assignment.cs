@@ -56,6 +56,8 @@ namespace MySchool.API.Models.Dtos
         public SubjectResponseDto Subject { get; set; } = default!;
         public bool IsActive { get; set; } = true;
         public bool IsDeadlinePassed  => Deadline < DateTime.UtcNow;
+
+        public int TotalSubmissions { get; set; }
     }
 
     public class AssignmentSubmissionResponseDto : BaseResponseDto

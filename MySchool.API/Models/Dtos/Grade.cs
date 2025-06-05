@@ -28,6 +28,7 @@ namespace MySchool.API.Models.Dtos
         public SubjectResponseDto Subject { get; set; } = default!;
         public int TermNumber { get; set; }
         public float Mark { get; set; }
+        public bool IsPublished { get; set; }
     }
 
 

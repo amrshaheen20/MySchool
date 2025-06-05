@@ -18,7 +18,7 @@ namespace MySchool.API.Services.AttendanceContainer.Injector
             {
                 case eRole.Teacher:
 
-                    Where(x => x.CreatedById == UserId);
+                    Where(x => x.ClassRoom.Timetables.Any(x => x.TeacherId == UserId));
                     break;
                 case eRole.Student:
                     Where(x => x.StudentId == UserId);

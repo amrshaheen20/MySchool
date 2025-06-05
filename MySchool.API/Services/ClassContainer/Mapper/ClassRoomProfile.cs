@@ -16,7 +16,7 @@ namespace MySchool.API.Services.ClassContainer.Mapper
             //Response
             CreateMap<ClassRoom, ClassResponseDto>()
                 .ForMember(dest => dest.StudentCount, opt => opt.MapFrom(src => src.Enrollments.Count()))
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                .ForMember(dest => dest.TotalTimetables, opt => opt.MapFrom(src => src.Timetables.Count()));
         }
 
 
