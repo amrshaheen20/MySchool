@@ -33,5 +33,13 @@ namespace MySchool.API.Extensions
         {
             return (User)httpContext.Items[HttpContextItemKeys.CurrentUser]!;
         }
+
+        public static int GetUserId(this HttpContext httpContext)
+        {
+            var userIdClaim = httpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return userIdClaim == null ? throw new UnauthorizedAccessException("User not found in context.") : int.Parse(userIdClaim);
+        }
+
+
     }
 }

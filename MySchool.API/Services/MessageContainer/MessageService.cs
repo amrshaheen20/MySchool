@@ -56,7 +56,9 @@ namespace MySchool.API.Services.MessageContainer
 
             var newMessage = mapper.Map<Message>(request);
             newMessage.UserId = contextAccessor.GetUserId();
-            newMessage.User = contextAccessor.HttpContext!.GetCurrentUser();
+            await messageRepo.AddAsync(newMessage);
+            await unitOfWork.SaveAsync();
+
 
             if (ConversationRepo.UserOneId == contextAccessor.GetUserId())
             {
@@ -67,7 +69,6 @@ namespace MySchool.API.Services.MessageContainer
                 ConversationRepo.UserTwoLastReadMessageId = newMessage.Id;
             }
 
-            await messageRepo.AddAsync(newMessage);
             await unitOfWork.SaveAsync();
 
             var message = (await GetMessageByIdAsync(newMessage.Id))

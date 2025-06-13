@@ -24,9 +24,9 @@ internal class Program
         builder.Services.AddMemoryCache();
         builder.Services.AddSignalR(options =>
         {
-#if DEBUG
+
             options.EnableDetailedErrors = true;
-#endif
+
         });
 
 
@@ -89,7 +89,10 @@ internal class Program
         app.UseRouting();
         app.UseErrorHandler();
 
-        app.UseCors(c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        app.UseCors(c => c.AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin => true));
 
 
         app.UseHttpsRedirection();
@@ -99,6 +102,7 @@ internal class Program
         app.UseAuthorization();
 
         app.MapControllers();
+        app.UseWebSockets();
         app.MapChatHub();
 
         app.Run();

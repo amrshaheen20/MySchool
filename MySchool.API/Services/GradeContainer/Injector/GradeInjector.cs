@@ -39,7 +39,7 @@ namespace MySchool.API.Services.GradeContainer.Injector
                         .Where(x => x.GuardianId == UserId)
                         .Select(x => x.StudentId);
 
-                    Where(x => studentIds.Contains(x.StudentId));
+                    Where(x => studentIds.Contains(x.StudentId) && x.IsPublished);
                     break;
 
                 default:

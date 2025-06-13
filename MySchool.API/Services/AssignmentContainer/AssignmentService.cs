@@ -95,7 +95,7 @@ namespace MySchool.API.Services.AssignmentContainer
             mapper.Map(requestDto, assignmentEntity);
             assignmentEntity.FilePath = requestDto.Attachment != null ? fileStorage.SaveFile(requestDto.Attachment!) : assignmentEntity.FilePath;
             await unitOfWork.SaveAsync();
-          
+
             return new BaseResponse()
                            .SetStatus(HttpStatusCode.NoContent)
                            .SetMessage("Assignment updated successfully.");
@@ -249,8 +249,20 @@ namespace MySchool.API.Services.AssignmentContainer
         {
             var assigments = GetRepository().GetAllBy(
                 new CommandsInjector<Assignment>()
-                    .Where(x => x.ClassRoom.Enrollments.Any(t => t.StudentId == studentId))
-            );
+                    .Where(x => x.ClassRoom.Enrollments.Any(t => t.StudentId == studentId)))
+                    .ProjectTo<AssignmentResponseDto>(mapper.ConfigurationProvider);
+
+            var student = unitOfWork.GetRepository<Enrollment>().GetAll()
+                .Select(x => x.Student)
+                .ProjectTo<AccountResponseDto>(mapper.ConfigurationProvider)
+                .FirstOrDefault(t => t.Id == studentId);
+           
+            if (student == null)
+            {
+                return new BaseResponse<PaginateBlock<AssignmentSubmissionWithMissingResponseDto>>()
+                    .SetStatus(HttpStatusCode.NotFound)
+                    .SetMessage("Student not found");
+            }
 
             if (contextAccessor.GetUserRole() == Enums.eRole.Student && contextAccessor.GetUserId() != studentId)
             {
@@ -259,6 +271,8 @@ namespace MySchool.API.Services.AssignmentContainer
                     .SetMessage("You are not allowed to see this student's submissions");
             }
 
+
+
             if (!assigments.Any())
             {
                 return new BaseResponse<PaginateBlock<AssignmentSubmissionWithMissingResponseDto>>()
@@ -266,15 +280,15 @@ namespace MySchool.API.Services.AssignmentContainer
                     .SetMessage("Assignment not found");
             }
 
-            var submissions = GetSubmissionRepository().GetAllBy(
-            new CommandsInjector<AssignmentSubmission>()
-                ).ProjectTo<AssignmentSubmissionResponseDto>(mapper.ConfigurationProvider);
+            var submissions = GetSubmissionRepository()
+                .GetAll()
+                .ProjectTo<AssignmentSubmissionResponseDto>(mapper.ConfigurationProvider);
 
             var resultList = assigments.Select(x => new AssignmentSubmissionWithMissingResponseDto
             {
-                Student = mapper.Map<AccountResponseDto>(x.ClassRoom.Enrollments.First(t => t.StudentId == studentId).Student),
-                Assignment = mapper.Map<AssignmentResponseDto>(x),
-                Submission = submissions.FirstOrDefault(s => s.Student.Id == studentId),
+                Student = student,
+                Assignment = x,
+                Submission = submissions.FirstOrDefault(s => s.Student.Id == studentId && s.Assignment.Id == x.Id),
             });
 
 

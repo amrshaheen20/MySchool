@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using MySchool.API.Extensions;
+using MySchool.API.Models.Dtos;
+using MySchool.API.Services.AccountContainer;
 using MySchool.API.Services.ConversationContainer;
+using MySchool.API.Services.MessageContainer;
 using SignalRSwaggerGen.Attributes;
 
 namespace MySchool.API.Hubs
@@ -19,10 +22,13 @@ namespace MySchool.API.Hubs
 
     [SignalRHub(ChatHubExtensions.Route)]
     [Authorize(Policy = Policies.AllUsers)]
-    public class ChatHub
-    (ConversationService conversationService) : Hub
+    public class ChatHub(
+        ConversationService conversationService,
+        MessageService messageService,
+        ILogger<ChatHub> logger
+        ) : Hub
     {
-        private static Dictionary<string, List<string>> ConnectedUsers = new();
+        private static Dictionary<int, List<string>> ConnectedUsers = new();
 
         /// <summary>
         /// Sends a message to all connected clients in the specified conversation.
@@ -30,12 +36,20 @@ namespace MySchool.API.Hubs
         /// <param name="conversationId">Conversation ID to send the message
         /// to.</param> <param name="message">the message to send.</param>
         /// <returns></returns>
-        public async Task SendMessage(int conversationId, string message)
+        public async Task<MessageResponseDto?> SendMessage(int conversationId, string message)
         {
-            // Here you can add logic to save the message to the database if needed
-            // For example: await _messageService.SaveMessage(conversationId,
-            // message); Broadcast the message to all connected clients
-            await Clients.All.SendAsync("receive-message", conversationId, message);
+            var response = (await messageService.CreateMessageAsync(new()
+            {
+                ConversationId = conversationId,
+                Content = message
+            }));
+
+            if (!response.IsSuccess)
+            {
+                throw new ApplicationException(response.Message);
+            }
+
+            return response.Data;
         }
 
         /// <summary>
@@ -45,23 +59,40 @@ namespace MySchool.API.Hubs
         /// to.</param> <param name="messageId">Message ID to set as read.</param>
         public async Task SetLastReadMessage(int conversationId, int messageId)
         {
-            await conversationService.SetLastReadMessageAsync(conversationId,
-                                                              messageId);
+            var response = await conversationService.SetLastReadMessageAsync(conversationId, messageId);
+            if (!response.IsSuccess)
+            {
+                throw new ApplicationException(response.Message);
+            }
         }
+
+        /// <summary>
+        /// get User online status - For All
+        /// </summary>
+        /// <param name="userId">User ID to get his online status
+        public bool OnlineStatus(int userId)
+        {
+            if (ConnectedUsers.ContainsKey(userId))
+                return true;
+
+            return false;
+        }
+
 
         [SignalRHidden]
         public override async Task OnConnectedAsync()
         {
             var connectionId = Context.ConnectionId;
-            var userId = Context.User?.Identity?.Name!;
+            var userId = Context.GetHttpContext()!.GetUserId();
+
+
 
             if (!ConnectedUsers.ContainsKey(userId))
                 ConnectedUsers[userId] = new List<string>();
 
             ConnectedUsers[userId].Add(connectionId);
 
-            Console.WriteLine(
-                $"User {userId} connected with connection {connectionId}");
+            logger.LogInformation($"User {userId} connected with connection {connectionId}");
 
             await base.OnConnectedAsync();
         }
@@ -70,7 +101,7 @@ namespace MySchool.API.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            var userId = Context.User?.Identity?.Name!;
+            var userId = Context.GetHttpContext()!.GetUserId();
 
             if (ConnectedUsers.ContainsKey(userId))
             {
@@ -79,8 +110,7 @@ namespace MySchool.API.Hubs
                 if (ConnectedUsers[userId].Count == 0)
                     ConnectedUsers.Remove(userId);
 
-                Console.WriteLine(
-                    $"User {userId} disconnected from connection {connectionId}");
+                logger.LogInformation($"User {userId} disconnected from connection {connectionId}");
             }
 
             await base.OnDisconnectedAsync(exception);

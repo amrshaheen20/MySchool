@@ -28,7 +28,7 @@ namespace MySchool.API.Models.DbSet
     {
         public void Configure(EntityTypeBuilder<Grade> builder)
         {
-            builder.HasIndex(x => new { x.StudentId, x.SubjectId }).IsUnique();
+            builder.HasIndex(x => new { x.StudentId, x.SubjectId, x.TermNumber }).IsUnique();
             builder.HasIndex(x => x.StudentId);
             builder.HasIndex(x => x.SubjectId);
             builder.HasIndex(x => x.CreatedById);

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using MySchool.API.Common;
 using MySchool.API.Extensions;
 using MySchool.API.Interfaces;
@@ -114,22 +116,22 @@ namespace MySchool.API.Services.AccountContainer
 
         #region Auth
 
-        public async Task<IBaseResponse<bool>> IsUserOnline(int userId)
-        {
-            var user = await GetRepository().GetByIdAsync(userId);
-            if (user == null)
-            {
-                return new BaseResponse<bool>()
-                    .SetStatus(HttpStatusCode.NotFound)
-                    .SetMessage("User not found.");
-            }
+        //public async Task<IBaseResponse<bool>> IsUserOnlineAsync(int userId)
+        //{
+        //    var user = await unitOfWork.GetRepository<User>().AddInjector(pepoleInjector).GetByIdAsync(userId);
+        //    if (user == null)
+        //    {
+        //        return new BaseResponse<bool>()
+        //            .SetStatus(HttpStatusCode.NotFound)
+        //            .SetMessage("User not found.");
+        //    }
 
-            var IsOnline = user.LastActiveTime <= DateTime.UtcNow.AddMinutes(10);
+        //    var IsOnline = user.LastActiveTime <= DateTime.UtcNow.AddMinutes(10);
 
-            return new BaseResponse<bool>()
-                .SetStatus(HttpStatusCode.OK)
-                .SetData(IsOnline);
-        }
+        //    return new BaseResponse<bool>()
+        //        .SetStatus(HttpStatusCode.OK)
+        //        .SetData(IsOnline);
+        //}
 
         public IBaseResponse<AccountAdminResponseDto> GetAccountByAuthAsync()
         {
@@ -209,12 +211,15 @@ namespace MySchool.API.Services.AccountContainer
         private async Task<IBaseResponse<LoginResponseDto>> GenerateTokenAsync(User user)
         {
             var token = jwtService.GenerateJwtToken(user);
-
+           
+            StringValues userAgentValues;
+            contextAccessor.HttpContext!.Request.Headers.TryGetValue(HeaderNames.UserAgent, out userAgentValues);
             var userSession = new UserSession
             {
                 UserId = user.Id,
                 TokenId = token.Token.Id,
-                ExpirationTime = token.Token.ValidTo
+                ExpirationTime = token.Token.ValidTo,
+                UserAgent = userAgentValues.ToString()
             };
 
             await unitOfWork.GetRepository<UserSession>().AddAsync(userSession);

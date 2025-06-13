@@ -369,5 +369,4 @@ Migrations
 Files
 .config
 wwwroot
-BuildInfo.cs
 /MySchool.API/BuildInfo.cs

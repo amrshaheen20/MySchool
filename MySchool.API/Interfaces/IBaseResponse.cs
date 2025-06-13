@@ -5,6 +5,7 @@ namespace MySchool.API.Interfaces
 {
     public interface IBaseResponse<T>
     {
+        public bool IsSuccess { get; }
         HttpStatusCode Status { get; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

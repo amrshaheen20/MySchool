@@ -157,7 +157,7 @@ namespace MySchool.API.Services.GradeContainer
             var subjectGrades = students.Select(enrollment => new SubjectGradesResponseDto
             {
                 Student = enrollment.Student,
-                Grade = grades.FirstOrDefault(a => a.Student.Id == enrollment.Student.Id && a.Student.Id == request.SubjectId && a.TermNumber == request.Term)
+                Grade = grades.FirstOrDefault(a => a.Student.Id == enrollment.Student.Id && a.Subject.Id == request.SubjectId && a.TermNumber == request.Term)
             });
 
             return new BaseResponse<PaginateBlock<SubjectGradesResponseDto>>()

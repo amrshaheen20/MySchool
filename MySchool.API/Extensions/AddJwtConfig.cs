@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MySchool.API.Common;
+using MySchool.API.Hubs;
 using MySchool.API.Interfaces;
 using MySchool.API.Models.DbSet;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,12 +38,24 @@ namespace MySchool.API.Extensions
                 {
                     OnMessageReceived = context =>
                     {
-                        var accessToken = context.Request.Headers["access_token"];
-                        if (!string.IsNullOrEmpty(accessToken))
-                            context.Token = accessToken;
+                        var tokenFromHeader = context.Request.Headers["access_token"].FirstOrDefault();
+                        if (!string.IsNullOrEmpty(tokenFromHeader))
+                        {
+                            context.Token = tokenFromHeader;
+                            return Task.CompletedTask;
+                        }
+
+                        var tokenFromQuery = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(tokenFromQuery) && path.StartsWithSegments("/" + ChatHubExtensions.Route))
+                        {
+                            context.Token = tokenFromQuery;
+                        }
 
                         return Task.CompletedTask;
-                    },
+                    }
+,
                     OnTokenValidated = async context =>
                     {
                         var cancellationToken = context.HttpContext.RequestAborted;

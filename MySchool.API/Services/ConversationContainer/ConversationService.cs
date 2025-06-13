@@ -20,7 +20,7 @@ namespace MySchool.API.Services.ConversationContainer
         ConversationInjector conversationInjector,
         IHttpContextAccessor contextAccessor,
         IHubContext<ChatHub> hubContext,
-        AccountInjector accountInjector
+        PepoleInjector pepoleInjector
         ) : IServiceInjector
     {
         private IGenericRepository<Conversation> GetRepository()
@@ -157,8 +157,7 @@ namespace MySchool.API.Services.ConversationContainer
 
         public IBaseResponse<PaginateBlock<ConversationPeopleResponseDto>> GetAllPeople(PaginationFilter<ConversationPeopleResponseDto> filter)
         {
-            accountInjector.ConversationPeopleInject();
-            var userRepo = unitOfWork.GetRepository<User>().AddInjector(accountInjector);
+            var userRepo = unitOfWork.GetRepository<User>().AddInjector(pepoleInjector);
             var timetableRepo = unitOfWork.GetRepository<Timetable>();
 
             var users = userRepo.GetAll();

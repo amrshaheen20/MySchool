@@ -8,18 +8,18 @@ namespace MySchool.API.Services.AccountContainer.Injector
 {
     public class AccountInjector : CommandsInjector<User>, IServiceInjector
     {
-        private readonly IHttpContextAccessor contextAccessor;
-        private readonly IUnitOfWork unitOfWork;
 
-        public AccountInjector(IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
+        public AccountInjector()
         {
             //AddCommand(q => q.Include(x => x.CustomFields));
             AddCommand(q => q.OrderByDescending(x => x.Id));
-            this.contextAccessor = contextAccessor;
-            this.unitOfWork = unitOfWork;
         }
 
-        public void ConversationPeopleInject()
+    }
+
+    public class PepoleInjector : AccountInjector, IServiceInjector
+    {
+        public PepoleInjector(IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork) : base()
         {
             var userId = contextAccessor.GetUserId();
             var userRole = contextAccessor.GetUserRole();
